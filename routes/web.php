@@ -8,6 +8,7 @@ use App\Http\Controllers\BookImportController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\BookReservationController;
 use App\Http\Controllers\BookReviewController;
+use App\Http\Controllers\ClassController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/books/{book}/review', [BookReviewController::class, 'createOrEdit'])->name('book_reviews.form');
     Route::post('/books/review', [BookReviewController::class, 'store'])->name('book_reviews.store');
     Route::delete('/books/{book}/review', [BookReviewController::class, 'destroy'])->name('book_reviews.destroy');
+    Route::resource('classes', ClassController::class);
 });
 
 
