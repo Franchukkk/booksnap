@@ -8,6 +8,7 @@ use App\Http\Controllers\BookImportController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\BookReservationController;
 use App\Http\Controllers\BookReviewController;
+use App\Http\Controllers\UserApprovalController;
 use App\Http\Controllers\ClassController;
 
 Route::get('/', function () {
@@ -34,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/books/review', [BookReviewController::class, 'store'])->name('book_reviews.store');
     Route::delete('/books/{book}/review', [BookReviewController::class, 'destroy'])->name('book_reviews.destroy');
     Route::resource('classes', ClassController::class);
+    Route::get('/admin/pending-users', [UserApprovalController::class, 'index'])->name('admin.pending-users');
+    Route::post('/admin/users/{id}/approve', [UserApprovalController::class, 'approve'])->name('admin.users.approve');
+    Route::delete('/admin/users/{id}/reject', [UserApprovalController::class, 'reject'])->name('admin.users.reject');
 });
 
 

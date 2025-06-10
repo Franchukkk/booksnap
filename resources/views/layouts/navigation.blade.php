@@ -41,6 +41,9 @@
                         <x-nav-link :href="route('classes.create')" :active="request()->routeIs('classes.create')">
                             {{ __('Додати клас') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.pending-users')" :active="request()->routeIs('admin.pending-users')">
+                            {{ __('Підтвердження користувачів') }}
+                        </x-nav-link>
                     @endif
 
                     <x-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
@@ -128,6 +131,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('classes.create')" :active="request()->routeIs('classes.create')">
                     {{ __('Додати клас') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.pending-users')" :active="request()->routeIs('admin.pending-users')">
+                    {{ __('Підтвердження користувачів') }}
                 </x-responsive-nav-link>
             @endif
 

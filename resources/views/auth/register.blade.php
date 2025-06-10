@@ -55,11 +55,20 @@
             <x-input-label for="school_id" :value="__('School')" />
             <select id="school_id" name="school_id" class="block mt-1 w-full">
                 <option value="">-- Select School --</option>
-                {{-- Тут згодом виведеш @foreach ($schools as $school) --}}
-                <option value="1">School #1</option>
-                <option value="2">School #2</option>
+                @foreach ($schools as $school)
+                    <option value="{{ $school->id }}">{{ $school->name }}</option>
+                @endforeach
             </select>
             <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+        </div>
+
+        <!-- Class Select -->
+        <div id="class-select-wrapper" class="mt-4 hidden">
+            <x-input-label for="class_id" :value="__('Class')" />
+            <select id="class_id" name="class_id" class="block mt-1 w-full">
+                <option value="">-- Select Class --</option>
+            </select>
+            <x-input-error :messages="$errors->get('class_id')" class="mt-2" />
         </div>
 
         <!-- Password -->
@@ -90,19 +99,62 @@
     <script>
         const roleSelect = document.getElementById('role');
         const schoolSelectWrapper = document.getElementById('school-select-wrapper');
+        const schoolSelect = document.getElementById('school_id');
+        const classSelectWrapper = document.getElementById('class-select-wrapper');
+        const classSelect = document.getElementById('class_id');
 
-        roleSelect.addEventListener('change', function () {
-            if (this.value && this.value !== 'admin') {
+        const allClasses = @json($classes);
+
+        roleSelect.addEventListener('change', handleRoleChange);
+        schoolSelect.addEventListener('change', handleSchoolChange);
+
+        function handleRoleChange() {
+            const role = roleSelect.value;
+
+            if (role && role !== 'admin') {
                 schoolSelectWrapper.classList.remove('hidden');
+
+                if (role === 'student' || role === 'teacher') {
+                    if (schoolSelect.value) {
+                        showClassSelect(schoolSelect.value);
+                    }
+                    classSelectWrapper.classList.remove('hidden');
+                } else {
+                    classSelectWrapper.classList.add('hidden');
+                }
             } else {
                 schoolSelectWrapper.classList.add('hidden');
+                classSelectWrapper.classList.add('hidden');
             }
-        });
+        }
 
-        // Запуск після завантаження сторінки (наприклад, при поверненні з помилками)
-        window.addEventListener('DOMContentLoaded', () => {
-            if (roleSelect.value && roleSelect.value !== 'admin') {
-                schoolSelectWrapper.classList.remove('hidden');
+        function handleSchoolChange() {
+            const selectedSchoolId = schoolSelect.value;
+
+            if ((roleSelect.value === 'student' || roleSelect.value === 'teacher') && selectedSchoolId) {
+                showClassSelect(selectedSchoolId);
+                classSelectWrapper.classList.remove('hidden');
+            } else {
+                classSelectWrapper.classList.add('hidden');
+            }
+        }
+
+        function showClassSelect(schoolId) {
+            const filteredClasses = allClasses.filter(cls => cls.school_id == schoolId);
+            classSelect.innerHTML = '<option value="">-- Select Class --</option>';
+            filteredClasses.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.id;
+                option.textContent = cls.name;
+                classSelect.appendChild(option);
+            });
+        }
+
+        // Ініціалізація при завантаженні
+        document.addEventListener('DOMContentLoaded', () => {
+            handleRoleChange();
+            if (schoolSelect.value) {
+                showClassSelect(schoolSelect.value);
             }
         });
     </script>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\School;
+use App\Models\ClassModel;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,7 +21,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        $schools = School::all();
+        $classes = ClassModel::all();
+        return view('auth.register', compact('schools', 'classes'));
     }
 
     /**
@@ -38,6 +42,7 @@ class RegisteredUserController extends Controller
             'role' => ['required', 'in:student,teacher,librarian,admin'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'school_id' => ['nullable', 'required_unless:role,admin', 'exists:schools,id'],
+            'class_id' => ['nullable', 'required_if:role,student,teacher', 'exists:classes,id'],
         ]);
 
         $user = User::create([
@@ -51,6 +56,20 @@ class RegisteredUserController extends Controller
             'status' => 'pending', // за замовчуванням
             'school_id' => $request->role !== 'admin' ? $request->school_id : null,
         ]);
+
+        if ($request->role === 'admin') {
+            $user->status = 'active';
+            $user->save();
+        }
+
+        if (in_array($request->role, ['student', 'teacher']) && $request->class_id) {
+            $class = ClassModel::findOrFail($request->class_id);
+            if ($request->role === 'student') {
+                $class->students()->attach($user->id);
+            } elseif ($request->role === 'teacher') {
+                $class->teachers()->attach($user->id);
+            }
+        }
 
         event(new Registered($user));
 
