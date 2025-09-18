@@ -19,12 +19,12 @@
 
         <div class="mb-6">
             <label for="due_date" class="block text-gray-300 text-sm font-bold mb-2">Дата повернення:</label>
-            <input type="date" name="due_date" value="{{ optional($reservation->due_date)->format('Y-m-d') }}" class="w-full bg-gray-700 border border-gray-600 text-black rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <input type="date" name="due_date" value="{{ $reservation->due_date }}" class="w-full bg-gray-700 border border-gray-600 text-black rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
 
         <div class="mb-6">
             <label for="returned_at" class="block text-gray-300 text-sm font-bold mb-2">Дата фактичного повернення:</label>
-            <input type="date" name="returned_at" value="{{ optional($reservation->returned_at)->format('Y-m-d') }}" class="w-full bg-gray-700 border border-gray-600 text-black rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <input type="date" name="returned_at" value="{{ $reservation->due_date  }}" class="w-full bg-gray-700 border border-gray-600 text-black rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
 
         <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">

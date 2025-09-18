@@ -13,10 +13,10 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('books.index')" :active="request()->routeIs('books.index')">
+                        {{ __('Книги') }}
+                    </x-nav-link>
                     @if(in_array(Auth::user()->role, ['admin', 'librarian']))
-                        <x-nav-link :href="route('books.index')" :active="request()->routeIs('books.index')">
-                            {{ __('Книги') }}
-                        </x-nav-link>
                         <x-nav-link :href="route('books.create')" :active="request()->routeIs('books.create')">
                             {{ __('Додати книгу') }}
                         </x-nav-link>
@@ -104,10 +104,10 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
+            <x-responsive-nav-link :href="route('books.index')" :active="request()->routeIs('books.index')">
+                {{ __('Книги') }}
+            </x-responsive-nav-link>
             @if(in_array(Auth::user()->role, ['admin', 'librarian']))
-                <x-responsive-nav-link :href="route('books.index')" :active="request()->routeIs('books.index')">
-                    {{ __('Книги') }}
-                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('books.create')" :active="request()->routeIs('books.create')">
                     {{ __('Додати книгу') }}
                 </x-responsive-nav-link>

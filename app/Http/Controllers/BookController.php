@@ -17,20 +17,24 @@ class BookController extends Controller
             $query->where('school_id', $request->school_id);
         }
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('genre', 'like', "%{$search}%");
+                ->orWhere('author', 'like', "%{$search}%")
+                ->orWhere('genre', 'like', "%{$search}%");
             });
         }
 
-        if ($request->has('type')) {
+        if ($request->filled('genre')) {
+            $query->where('genre', $request->genre);
+        }
+
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        if ($request->has('subject')) {
+        if ($request->filled('subject')) {
             $query->where('subject', $request->subject);
         }
 
@@ -39,20 +43,49 @@ class BookController extends Controller
             $query->where('is_recommended', $isRecommended);
         }
 
-        $books = $query->paginate(10);
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'title_asc':
+                    $query->orderBy('title', 'asc');
+                    break;
+                case 'title_desc':
+                    $query->orderBy('title', 'desc');
+                    break;
+                case 'author_asc':
+                    $query->orderBy('author', 'asc');
+                    break;
+                case 'author_desc':
+                    $query->orderBy('author', 'desc');
+                    break;
+            }
+        }
 
-        return view('books.index', compact('books'));
+        $books = $query->paginate(10)->appends($request->query());
+
+        $genres = Book::distinct()->pluck('genre');
+        $types = Book::distinct()->pluck('type');
+
+        return view('books.index', compact('books', 'genres', 'types'));
     }
+
 
     // Show form to create book
     public function create()
     {
+        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'librarian') {
+            abort(403, 'Unauthorized action.');
+        }
+
         return view('books.create');
     }
 
     // Store a new book
     public function store(Request $request)
     {
+        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'librarian') {
+            abort(403, 'Unauthorized action.');
+        }
+
         if (auth()->user()->school_id === null) {
             abort(403, 'Для того щоб додати книгу, спочатку необхідно створити школу.');
         }
@@ -88,6 +121,10 @@ class BookController extends Controller
     // Show edit form
     public function edit(Book $book)
     {
+        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'librarian') {
+            abort(403, 'Unauthorized action.');
+        }
+
         return view('books.edit', compact('book'));
     }
 

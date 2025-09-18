@@ -22,8 +22,9 @@
                     <th class="px-6 py-4 text-white font-semibold">Книга</th>
                     <th class="px-6 py-4 text-white font-semibold">Користувач</th>
                     <th class="px-6 py-4 text-white font-semibold">Статус</th>
-                    <th class="px-6 py-4 text-white font-semibold">Дата бронювання</th>
-                    <th class="px-6 py-4 text-white font-semibold">Дата повернення</th>
+                    <th class="px-6 py-4 text-white font-semibold">Дата бронювання / резервації</th>
+                    <th class="px-6 py-4 text-white font-semibold">Термін повернення</th>
+                    <th class="px-6 py-4 text-white font-semibold">Фактична дата повернення</th>
                     <th class="px-6 py-4 text-white font-semibold">Дії</th>
                 </tr>
             </thead>
@@ -43,28 +44,43 @@
                         </td>
                         <td class="px-6 py-4 text-white">{{ $reservation->reserved_at }}</td>
                         <td class="px-6 py-4 text-white">{{ $reservation->due_date }}</td>
+                        <td class="px-6 py-4 text-white">{{ $reservation->returned_at }}</td>
                         <td class="px-6 py-4">
                             <div class="flex space-x-2">
-                                @if(auth()->user()->role == 'librarian' || auth()->user()->role == 'admin')
-                                    <a href="{{ route('reservations.edit', $reservation) }}" 
-                                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md transition duration-200">
-                                        Редагувати
-                                    </a>
-                                @endif
-                                <form action="{{ route('reservations.destroy', $reservation) }}" method="POST" onsubmit="return confirm('Ви впевнені?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-200">
-                                        Видалити
-                                    </button>
-                                </form>
-                                @if($reservation->status === 'reserved' && (auth()->user()->role == 'librarian' || auth()->user()->role == 'admin'))
-                                    <form action="{{ route('reservations.borrow', $reservation) }}" method="POST">
+                                @if(auth()->user()->role == 'student')
+                                    @if($reservation->status === 'reserved')
+                                        <form action="{{ route('reservations.destroy', ['reservation' => $reservation]) }}" method="POST" onsubmit="return confirm('Ви впевнені?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-200">
+                                                Видалити
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    @if(auth()->user()->role == 'librarian' || auth()->user()->role == 'admin')
+                                        <a href="{{ route('reservations.edit', $reservation) }}" 
+                                           class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md transition duration-200">
+                                            Редагувати
+                                        </a>
+                                    @endif
+                                    @if($reservation->status === 'reserved')
+                                    <form action="{{ route('reservations.destroy', $reservation) }}" method="POST" onsubmit="return confirm('Ви впевнені?')">
                                         @csrf
-                                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition duration-200">
-                                            Позичити
+                                        @method('DELETE')
+                                        <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-200">
+                                            Видалити
                                         </button>
                                     </form>
+                                    @endif
+                                    @if($reservation->status === 'reserved' && (auth()->user()->role == 'librarian' || auth()->user()->role == 'admin'))
+                                        <form action="{{ route('reservations.borrow', $reservation) }}" method="POST">
+                                            @csrf
+                                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition duration-200">
+                                                Позичити
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
                             </div>
                         </td>

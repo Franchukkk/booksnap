@@ -1,66 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+1. Ролі користувачів та їхні повноваження
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1.1 Адміністратор
+Реєструє школу.
+Створює та редагує класи.
+Додає учнів, учителів та бібліотекарів до системи.
+Призначає ролі користувачам (учень, учитель, бібліотекар).
+Імпортує підручники та книги вручну або через Excel-таблицю.
+Має доступ до повного пошуку користувачів та книг.
+Може переглядати історію бронювань, боргів.
+Має право знімати бронювання та борги.
+Може переглядати аналітику популярних/непопулярних книг.
+Має доступ до звітів.
+Може видаляти або деактивувати користувачів.
+1.2 Бібліотекар
+Має доступ до бази книг.
+Може додавати нові книги або редагувати інформацію про них.
+Здійснює підтвердження або скасування броней.
+Відзначає повернення книг та облік боргів.
+Може шукати книги та користувачів за іменем, назвою книги, номером книги тощо.
+Має доступ до аналітики популярності книг.
+Надсилає або переглядає нагадування про необхідність повернення книги.
+1.3 Учень
+Реєструється за email-адресою або додається адміністратором.
+Прив’язується до певного класу.
+Має можливість переглядати список всіх книг.
+Може бронювати книги через особистий кабінет.
+Може переглядати статус своїх броней: активні, виконані, з боргом.
+Має можливість шукати книги за назвою, автором, жанром або сюжетом (??? з використанням ШІ ???).
+1.4 Учитель
+Реєструється або додається адміністратором.
+Має доступ до всього каталогу книг.
+Може бронювати книги для особистого користування або навчального процесу.
+Переглядає свою історію бронювань і заборгованостей.
+Може залишати відгуки або рекомендації на книги (опціонально).
 
-## About Laravel
+2. Управління книгами
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+2.1 Додавання книг
+Вручну через форму з такими полями: назва, автор, жанр, ISBN, клас (не обов’язково), опис, кількість примірників, код книги.
+Масовий імпорт з Excel (підтримка шаблону з відповідними колонками).
+2.2 Редагування та видалення
+Адміністратор або бібліотекар можуть змінити або видалити книгу.
+2.3 Каталог книг
+Можливість сортування за класом, жанром, назвою, кількістю доступних примірників.
+Можливість додавати книги до "рекомендованих".
+3. Пошук та фільтрація
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+3.1 Пошук книг
+За назвою.
+За автором.
+За жанром.
+За номером книги.
+??? За допомогою нейромережі (ввівши сюжет чи тему, яка цікавить). ???
+3.2 Пошук користувачів (для адміністратора і бібліотекаря)
+За прізвищем.
+За email.
+За номером книги, яку тримає користувач.
+За класом або роллю.
+4. Бронювання і облік
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+4.1 Бронювання
+Користувач вибирає книгу, підтверджує бронювання.
+Система перевіряє наявність вільного примірника.
+Успішне бронювання потрапляє до розділу "Активні броні".
+4.2 Повернення
+Відзначається бібліотекарем або системою (якщо книга просканована по QR-коду).
+Якщо книга не повернута вчасно — автоматично створюється борг.
+Можливість зняття боргу адміністратором/бібліотекарем.
+4.3 Нагадування
+Автоматична відправка email/смс з нагадуванням за декілька днів до завершення терміну.
+5. Аналітика і автоматизація
 
-## Learning Laravel
+5.1 Популярність книг
+Система фіксує кількість броней кожної книги за певний період.
+Створюється список популярних та непопулярних книг.
+Непопулярні книги можна помітити для вилучення або заміни.
+5.2 Автоматичне вилучення користувачів
+Якщо учень досяг 18 років.
+Якщо учень більше не закріплений за класом або школою.
+Користувач переноситься до "корзини", обліковий запис деактивується (тільки якщо немає боргів).
+6. Додатковий функціонал
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6.1 Журнал дій
+Логування всіх дій адміністратора, бібліотекаря, користувачів.
+Можливість відновлення історії змін.
+6.2 Список очікування
+Якщо всі примірники книги заброньовані, користувач може встати в чергу.
+При поверненні примірника — бронь переходить до першого в черзі.
+6.3 Запит на нову книгу
+Користувач може залишити запит на додавання певної книги.
+Адміністратор бачить усі запити і може задовольнити їх.
+6.4 Звіти
+Статистика броней по класах, книгах, ролях.
+Звіт по боржниках.
+Експорт в PDF/Excel.
+6.5 Мобільна версія або додаток
+Бронювання через мобільний інтерфейс.
+Push-нотифікації про нові книги або нагадування.

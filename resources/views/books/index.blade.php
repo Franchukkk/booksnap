@@ -10,6 +10,45 @@
         </div>
     @endif
 
+    <!-- Фільтри та сортування -->
+    <div class="mb-6 p-4 bg-white dark:bg-gray-800 rounded shadow">
+        <form action="{{ route('books.index') }}" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Жанр</label>
+                    <select name="genre" class="mt-1 block w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+                        <option value="">Всі жанри</option>
+                        @foreach($genres as $genre)
+                            <option value="{{ $genre }}" {{ request('genre') == $genre ? 'selected' : '' }}>
+                                {{ $genre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Пошук</label>
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           class="mt-1 block w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                           placeholder="Назва або автор...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Сортування</label>
+                    <select name="sort" class="mt-1 block w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+                        <option value="title_asc" {{ request('sort') == 'title_asc' ? 'selected' : '' }}>Назва (А-Я)</option>
+                        <option value="title_desc" {{ request('sort') == 'title_desc' ? 'selected' : '' }}>Назва (Я-А)</option>
+                        <option value="author_asc" {{ request('sort') == 'author_asc' ? 'selected' : '' }}>Автор (А-Я)</option>
+                        <option value="author_desc" {{ request('sort') == 'author_desc' ? 'selected' : '' }}>Автор (Я-А)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Застосувати фільтри
+                </button>
+            </div>
+        </form>
+    </div>
+
     @auth
         @if(Auth::user()->role === 'admin')
             <a href="{{ route('books.create') }}"
@@ -69,13 +108,11 @@
                                     </button>
                                 </form>
 
-                                {{-- Кнопка перегляду відгуків --}}
                                 <a href="{{ route('book_reviews.index', $book->id) }}"
                                 class="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700">
                                     Відгуки
                                 </a>
 
-                                {{-- Кнопка залишити/редагувати відгук --}}
                                 <a href="{{ route('book_reviews.form', $book->id) }}"
                                 class="px-3 py-1 text-sm bg-pink-600 text-white rounded hover:bg-pink-700">
                                     Залишити відгук
@@ -89,7 +126,7 @@
     </div>
 
     <div class="mt-6">
-        {{ $books->links() }}
+        {{ $books->appends(request()->query())->links() }}
     </div>
 </div>
 @endsection

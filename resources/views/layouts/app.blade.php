@@ -13,8 +13,13 @@
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        @include('layouts.navigation') {{-- або <x-navigation /> якщо компонент --}}
+        @include('layouts.navigation')
 
+        <?php
+        if (auth()->user()->status == 'pending') {
+            abort(403, 'Ваш обліковий запис ще не активовано. Будь ласка, зачекайте підтвердження від адміністратора школи.');
+        }
+        ?>
         <!-- Page Heading -->
         @hasSection('header')
             <header class="bg-white dark:bg-gray-800 shadow">

@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class BookReservationController extends Controller
 {
@@ -40,6 +41,10 @@ class BookReservationController extends Controller
     // Форма створення бронювання
     public function create()
     {
+        if (auth()->user()->status == 'pending') {
+            abort(403, 'Ваш обліковий запис ще не активовано.');
+        }
+
         $books = Book::all();
         return view('books.index', compact('books'));
     }
@@ -47,6 +52,10 @@ class BookReservationController extends Controller
     // Зберегти бронювання
     public function store(Request $request)
     {
+        if (auth()->user()->status == 'pending') {
+            abort(403, 'Ваш обліковий запис ще не активовано.');
+        }
+
         $existing = BookReservation::where('user_id', auth()->user()->id)
             ->where('book_id', $request->book_id)
             ->whereIn('status', ['reserved', 'borrowed'])
@@ -76,7 +85,7 @@ class BookReservationController extends Controller
             'user_id' => $data['user_id'],
             'book_id' => $data['book_id'],
             'reserved_at' => Carbon::now(),
-            'due_date' => Carbon::now()->addDays(2),
+            'due_date' => null,
             'status' => 'reserved',
         ]);
 
@@ -86,6 +95,10 @@ class BookReservationController extends Controller
     // Позичити книгу
     public function borrow(BookReservation $bookReservation)
     {
+        if (auth()->user()->status == 'pending') {
+            abort(403, 'Ваш обліковий запис ще не активовано.');
+        }
+
         if ($bookReservation->status !== 'reserved') {
             return redirect()->back()->withErrors(['error' => 'Книгу можна позичити лише зі статусу reserved']);
         }
@@ -102,17 +115,27 @@ class BookReservationController extends Controller
     // Форма редагування
     public function edit(BookReservation $reservation)
     {
+        if (auth()->user()->status == 'pending') {
+            abort(403, 'Ваш обліковий запис ще не активовано.');
+        }
+
         return view('reservations.edit', compact('reservation'));
     }
 
     // Оновити бронювання
     public function update(Request $request, BookReservation $reservation)
     {
+        if (auth()->user()->status == 'pending') {
+            abort(403, 'Ваш обліковий запис ще не активовано.');
+        }
+
         $data = $request->validate([
             'status' => ['sometimes', Rule::in(['reserved', 'borrowed', 'returned', 'overdue', 'cancelled'])],
             'due_date' => 'nullable|date|after_or_equal:today',
             'returned_at' => 'nullable|date',
         ]);
+
+        $data['returned_at'] = ($data['status'] == 'returned' || $data['status'] == 'overdue') ? $data['returned_at'] : null;
 
         $reservation->update($data);
 
@@ -120,9 +143,14 @@ class BookReservationController extends Controller
     }
 
     // Видалити бронювання
-    public function destroy(BookReservation $bookReservation)
+    public function destroy(BookReservation $reservation)
     {
-        $bookReservation->delete();
+        if (auth()->user()->status == 'pending') {
+            abort(403, 'Ваш обліковий запис ще не активовано.');
+        }
+        
+        $reservation->delete();
+        
         return redirect()->route('reservations.index')->with('success', 'Бронювання видалено');
     }
 }

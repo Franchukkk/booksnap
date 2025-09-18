@@ -27,7 +27,7 @@ class AnalyticsController extends Controller
         $dateFrom = Carbon::now()->subDays($days);
 
         $query = BookReservation::select('book_id', DB::raw('COUNT(*) as reservations_count'))
-            ->whereIn('status', ['reserved', 'borrowed'])
+            ->where('status', '!=', 'cancelled') // ❗ виключаємо скасовані
             ->where('reserved_at', '>=', $dateFrom);
 
         if ($schoolId) {
@@ -61,7 +61,7 @@ class AnalyticsController extends Controller
 
         $dateFrom = Carbon::now()->subDays($days);
 
-        $bookIdsWithReservations = BookReservation::whereIn('status', ['reserved', 'borrowed'])
+        $bookIdsWithReservations = BookReservation::where('status', '!=', 'cancelled') // ❗ виключаємо скасовані
             ->where('reserved_at', '>=', $dateFrom)
             ->when($schoolId, function ($query) use ($schoolId) {
                 $query->whereHas('book', function ($q) use ($schoolId) {
